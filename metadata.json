@@ -1,0 +1,6 @@
+{
+  "name": "El Códice de Alejandría",
+  "description": "Juego interactivo y gamificado de potencias para 2º de ESO con narrativa digital, guía ALEX-A, roles profesionales y panel docente.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
