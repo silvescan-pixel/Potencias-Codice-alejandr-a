@@ -87,12 +87,12 @@ export function generatePdfDiploma(progress: StudentProgress) {
 
   // Columns
   const missionKeys = [
-    { id: 'M1', name: 'Misión 1: Matriz de Calibración de Nodos (Base, Exp y Resultado)', xp: '100 XP' },
-    { id: 'INT1', name: 'Interludio 1: Papyrus Variable (Transmisión 2^n por minuto)', xp: '150 XP' },
-    { id: 'M2C', name: 'Misión 2.C: Cámara de Polaridad (Signos (-a)^n vs -a^n)', xp: '150 XP' },
-    { id: 'M3', name: 'Misión 3: Canales Primarios (Producto y Cociente a^k)', xp: '200 XP' },
+    { id: 'M1', name: 'Misión 1: Nodos de Signos y Matriz de Potencias', xp: '100 XP' },
+    { id: 'INT1', name: 'Interludio 1: Papiro de Duplicación (Crecimiento binario)', xp: '150 XP' },
+    { id: 'M2C', name: 'Misión 2.C: Cámara de Polaridad (Signos y paréntesis)', xp: '150 XP' },
+    { id: 'M3', name: 'Misión 3: Canales Primarios (Producto y cociente)', xp: '200 XP' },
     { id: 'M4', name: 'Misión 4: Núcleo de Simplificación Compleja (Fracciones)', xp: '600 XP' },
-    { id: 'M5', name: 'Misión 5: Restauración de Constantes Perdidas (x e Inversos)', xp: '750 XP' },
+    { id: 'M5', name: 'Misión 5: Restauración de Constantes Perdidas (Inversos)', xp: '750 XP' },
   ];
 
   let currentY = boxY + 18;
@@ -157,7 +157,7 @@ export function generatePdfDiploma(progress: StudentProgress) {
   doc.line(20, footerY + 2, 80, footerY + 2);
   doc.setFontSize(8);
   doc.setTextColor(0, 229, 255);
-  doc.text('FIRMA DIGITAL // SHA-256 ALEXANDRIA', 50, footerY + 6, { align: 'center' });
+  doc.text('FIRMA DIGITAL · SHA-256 ALEXANDRIA', 50, footerY + 6, { align: 'center' });
 
   // Center Seal
   doc.setFillColor(212, 175, 55);

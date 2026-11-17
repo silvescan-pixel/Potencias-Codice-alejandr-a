@@ -7,6 +7,7 @@ import {
   TeacherRecord 
 } from './types/game';
 import { HeaderHUD } from './components/HeaderHUD';
+import { TempleMap } from './components/TempleMap';
 import { AuthScreen } from './components/AuthScreen';
 import { CinematicBriefing } from './components/CinematicBriefing';
 import { AvatarSelectScreen } from './components/AvatarSelectScreen';
@@ -22,6 +23,7 @@ import { OutcomeScreen } from './components/missions/OutcomeScreen';
 import { SecretTetration } from './components/missions/SecretTetration';
 import { TeacherPanel } from './components/TeacherPanel';
 import { MusicController } from './components/MusicController';
+import { TEMPLE_CHAMBERS } from './data/templeNarrative';
 import { storage } from './utils/storage';
 
 export default function App() {
@@ -196,6 +198,19 @@ export default function App() {
     setPhase('AUTH');
   };
 
+  const showTempleMap =
+    Boolean(progress) &&
+    phase !== 'AUTH' &&
+    phase !== 'TEACHER_PANEL' &&
+    phase !== 'BRIEFING_M0' &&
+    phase !== 'AVATAR_SELECT';
+
+  const getRoleChamberCopy = (chamberId: string) => {
+    const chamber = TEMPLE_CHAMBERS.find((c) => c.id === chamberId)!;
+    const roleKey = progress?.roleId ?? 'DIGITAL_ARCHAEOLOGIST';
+    return { chamber, copy: chamber.roleBriefings[roleKey] };
+  };
+
   return (
     <div className="min-h-screen bg-[#120E0A] text-[#F1EBD9] flex flex-col font-sans selection:bg-[#D4AF37]/30 selection:text-white">
       {/* Global Top HUD Bar */}
@@ -209,6 +224,11 @@ export default function App() {
         }}
         onRestartStudent={handleRestart}
       />
+
+      {/* Temple Progression Map & Active Role Objective */}
+      {showTempleMap && progress && (
+        <TempleMap currentPhase={phase} progress={progress} />
+      )}
 
       {/* Main Mission Viewport */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -224,11 +244,12 @@ export default function App() {
         {phase === 'BRIEFING_M0' && progress && (
           <CinematicBriefing
             emotion="cold"
-            tag="MISIÓN 0 // IDENTIFICACIÓN ARQUEOLÓGICA"
+            tag="Misión 0 · Identificación de Expedición"
             title="Bienvenida al Templo de Alejandría"
-            subtitle="Contacto con ALEX-A (Unidad de Soporte Arqueo-Digital)"
-            dialogue="¡Credencial recibida! Acceso en fase de pruebas... Soy ALEX-A, Unidad de Soporte Arqueo-Digital. Antes de dejaros tocar las terminales de potencias de la Biblioteca, necesito saber a qué área pertenecéis. Elegid vuestro avatar profesional. ¡Vuestra credencial os acompañará en cada diploma que emitamos!"
-            buttonLabel="Seleccionar Avatar Profesional"
+            subtitle="Contacto inicial con ALEX-A (Unidad de Soporte Arqueo-Digital)"
+            dialogue={`¡Credencial recibida, ${progress.name} (${progress.group})! Soy ALEX-A, la inteligencia guardiana del Templo Sumergido de Alejandría. Una anomalía en las potencias amenaza con destruir todo el archivo antiguo. Antes de entrar en las 8 cámaras del templo, elige tu especialidad profesional: determinará tu función en la expedición y quedará grabada en tu diploma oficial.`}
+            showSingleAttemptWarning={false}
+            buttonLabel="Elegir Especialidad en el Templo"
             onProceed={() => setPhase('AVATAR_SELECT')}
           />
         )}
@@ -243,17 +264,22 @@ export default function App() {
         )}
 
         {/* Phase: Briefing Misión 1.A */}
-        {phase === 'BRIEFING_M1A' && (
-          <CinematicBriefing
-            emotion="cold"
-            tag="MISIÓN 1.A // CÁMARA DEL PAPIRO ANCESTRAL"
-            title="El Origen de la Potencia"
-            subtitle="Distinción formal entre multiplicación repetida y suma"
-            dialogue="No os hagáis ilusiones: el templo sumergido está colapsado. Dudo que un grupo de 2º de ESO pueda procesar esta matriz sin provocar un cortocircuito. Primero demostradme si sabéis distinguir una verdadera potencia de una vulgar suma repetida."
-            buttonLabel="Iniciar Prueba 1.A (Potencias vs Sumas)"
-            onProceed={() => setPhase('MISSION_1A')}
-          />
-        )}
+        {phase === 'BRIEFING_M1A' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M1A');
+          return (
+            <CinematicBriefing
+              emotion="cold"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Distinción entre multiplicación repetida y suma repetida"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Entrar a la Cámara 1 (Potencias vs Sumas)"
+              onProceed={() => setPhase('MISSION_1A')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 1.A */}
         {phase === 'MISSION_1A' && (
@@ -265,61 +291,76 @@ export default function App() {
         )}
 
         {/* Phase: Briefing Misión 1.B */}
-        {phase === 'BRIEFING_M1B' && (
-          <CinematicBriefing
-            emotion="cold"
-            tag="MISIÓN 1.B // LA GRAN ESTELA DE NODOS"
-            title="La Tabla en Blanco de Calibración"
-            subtitle="Deducción rigurosa de Base, Exponente y Resultado"
-            dialogue="Veo que habéis superado la primera criba... pero ahora viene la prueba real. La estela de piedra ha perdido todas sus inscripciones auxiliares. No os daré pistas ni cálculos intermedios: debéis deducir y completar cada celda en blanco de la matriz."
-            buttonLabel="Acceder a la Matriz de Nodos en Blanco"
-            onProceed={() => setPhase('MISSION_1B')}
-          />
-        )}
+        {phase === 'BRIEFING_M1B' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M1B');
+          return (
+            <CinematicBriefing
+              emotion="cold"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Deducción completa de potencia, base, exponente y resultado"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Acceder a la Estela de Nodos"
+              onProceed={() => setPhase('MISSION_1B')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 1.B (Blank Matrix) */}
         {phase === 'MISSION_1B' && (
           <Mission1BBlankMatrix
             onComplete={(score) => 
-              handleMissionCompleted('M1', 'Misión 1: Matriz de Calibración', 'Calibrador/a de Nodos', score, 'BRIEFING_INT1')
+              handleMissionCompleted('M1', 'Misión 1: Estela de Calibración', 'Calibrador/a de Nodos', score, 'BRIEFING_INT1')
             }
           />
         )}
 
         {/* Phase: Briefing Interludio 1 */}
-        {phase === 'BRIEFING_INT1' && (
-          <CinematicBriefing
-            emotion="cold"
-            tag="INTERLUDIO 1 // TRANSMISIÓN DEL PAPIRO CUÁNTICO"
-            title="El Cifrado del Papyrus Variable"
-            subtitle="Crecimiento exponencial modelizado por minutos"
-            dialogue="Vaya... Habéis calibrado las terminales. No está mal, aunque probablemente haya sido suerte. La transmisión del papiro digital de Alejandría crece a ritmo exponencial con la fórmula 2ⁿ por minuto transcurrido. A ver cómo modeláis este flujo de datos con datos dinámicos..."
-            buttonLabel="Entrar al Interludio 1"
-            onProceed={() => setPhase('INTERLUDE_1')}
-          />
-        )}
+        {phase === 'BRIEFING_INT1' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('INT1');
+          return (
+            <CinematicBriefing
+              emotion="cold"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Crecimiento exponencial por duplicación en cada minuto"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Entrar al Acueducto Exponencial"
+              onProceed={() => setPhase('INTERLUDE_1')}
+            />
+          );
+        })()}
 
-        {/* Phase: Interlude 1 (Procedural Dynamic 2^k · 2^m) */}
+        {/* Phase: Interlude 1 */}
         {phase === 'INTERLUDE_1' && (
           <Interlude1Papyrus
             onComplete={(score) => 
-              handleMissionCompleted('INT1', 'Interludio 1: Papyrus Variable', 'Decodificador/a de Transmisiones', score, 'BRIEFING_M2C')
+              handleMissionCompleted('INT1', 'Interludio 1: Acueducto Exponencial', 'Decodificador/a de Transmisiones', score, 'BRIEFING_M2C')
             }
           />
         )}
 
         {/* Phase: Briefing Misión 2.C */}
-        {phase === 'BRIEFING_M2C' && (
-          <CinematicBriefing
-            emotion="enthusiastic"
-            tag="MISIÓN 2.C // CÁMARA DE POLARIDAD"
-            title="La Sincronización de Signos Enteros"
-            subtitle="Paridad del exponente y distinción de paréntesis"
-            dialogue="La Cámara de Polaridad es traicionera. Un simple paréntesis olvidado en una base negativa y la señal se invierte por completo. Admito que no habéis tirado la toalla todavía y eso me resulta... interesante. ¡Sincronicemos los signos sin cálculos mastodónticos!"
-            buttonLabel="Entrar a la Cámara de Polaridad"
-            onProceed={() => setPhase('MISSION_2C')}
-          />
-        )}
+        {phase === 'BRIEFING_M2C' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M2C');
+          return (
+            <CinematicBriefing
+              emotion="enthusiastic"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Paridad del exponente y papel decisivo de los paréntesis"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Entrar a la Cámara de Polaridad"
+              onProceed={() => setPhase('MISSION_2C')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 2.C */}
         {phase === 'MISSION_2C' && (
@@ -331,17 +372,22 @@ export default function App() {
         )}
 
         {/* Phase: Briefing Misión 3 */}
-        {phase === 'BRIEFING_M3' && (
-          <CinematicBriefing
-            emotion="enthusiastic"
-            tag="MISIÓN 3 // FRECUENCIAS PRIMARIAS"
-            title="La Sintonización de Canales"
-            subtitle="Propiedades operativas y unificación estricta en formato a^k"
-            dialogue="¡Ey, buen trabajo en la cámara anterior! Se nota que estáis haciendo un buen equipo con la libreta. Los Canales Primarios exigen condensar las operaciones en una única potencia unificada (a^k). Ojo con los paréntesis en las bases negativas."
-            buttonLabel="Acceder a los Canales Primarios"
-            onProceed={() => setPhase('MISSION_3')}
-          />
-        )}
+        {phase === 'BRIEFING_M3' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M3');
+          return (
+            <CinematicBriefing
+              emotion="enthusiastic"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Productos y cocientes con la misma base en una sola potencia"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Acceder a los Canales Primarios"
+              onProceed={() => setPhase('MISSION_3')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 3 */}
         {phase === 'MISSION_3' && (
@@ -353,17 +399,22 @@ export default function App() {
         )}
 
         {/* Phase: Briefing Interludio 2 */}
-        {phase === 'BRIEFING_INT2' && (
-          <CinematicBriefing
-            emotion="enthusiastic"
-            tag="INTERLUDIO 2 // VÓRTICE CENTRAL"
-            title="El Enigma de la Pirámide de Datos"
-            subtitle="Optimización algorítmica con la ley a⁰ = 1"
-            dialogue="¡Buf, qué calor hace cerca de los procesadores centrales! La Pirámide nos pide calcular un bloque masivo: [(7⁴)¹²]⁰ · (-8)⁰. Si intentamos calcular 7⁴⁸ a lo bruto, ¡el servidor va a estallar! ¿Qué estrategia matemática seguimos para optimizarlo?"
-            buttonLabel="Enfrentar la Sobrecarga en la Pirámide"
-            onProceed={() => setPhase('INTERLUDE_2')}
-          />
-        )}
+        {phase === 'BRIEFING_INT2' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('INT2');
+          return (
+            <CinematicBriefing
+              emotion="enthusiastic"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Optimización algorítmica con la propiedad a^0 = 1"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Enfrentar la Sobrecarga en la Pirámide"
+              onProceed={() => setPhase('INTERLUDE_2')}
+            />
+          );
+        })()}
 
         {/* Phase: Interlude 2 */}
         {phase === 'INTERLUDE_2' && (
@@ -375,40 +426,50 @@ export default function App() {
         )}
 
         {/* Phase: Briefing Misión 4 */}
-        {phase === 'BRIEFING_M4' && (
-          <CinematicBriefing
-            emotion="enthusiastic"
-            tag="MISIÓN 4 // NÚCLEO FRACCIONARIO"
-            title="El Núcleo de Simplificación Compleja"
-            subtitle="Potencias de potencias y reducción paso a paso"
-            dialogue="¡Menudo nivelazo estáis demostrando, equipo! Llegamos al Núcleo Complejo, donde las fracciones kilométricas dominan las pantallas. Reducid cada terminal a una sola potencia unificada (a^k). Si cometéis un fallo, os lanzaré una pista flotante al instante. ¡Somos imparables!"
-            buttonLabel="Entrar al Núcleo Complejo"
-            onProceed={() => setPhase('MISSION_4')}
-          />
-        )}
+        {phase === 'BRIEFING_M4' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M4');
+          return (
+            <CinematicBriefing
+              emotion="enthusiastic"
+              tag={copy.contextTag}
+              title={chamber.chamberTitle}
+              subtitle="Potencias de potencias y simplificación de fracciones"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Entrar al Núcleo Fraccionario"
+              onProceed={() => setPhase('MISSION_4')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 4 */}
         {phase === 'MISSION_4' && (
           <Mission4Simplification
             onComplete={(score) => 
-              handleMissionCompleted('M4', 'Misión 4: Núcleo de Simplificación', 'Arquitecto/a de Simplificación', score, 'BRIEFING_M5')
+              handleMissionCompleted('M4', 'Misión 4: Núcleo Fraccionario', 'Arquitecto/a de Simplificación', score, 'BRIEFING_M5')
             }
           />
         )}
 
         {/* Phase: Briefing Misión 5 (Dramatic Climax) */}
-        {phase === 'BRIEFING_M5' && (
-          <CinematicBriefing
-            emotion="critical"
-            tag="MISIÓN 5 // CLÍMAX DRAMÁTICO"
-            title="Alerta Crítica: El Sacrificio de ALEX-A"
-            subtitle="Desintegración del cortafuegos y absorción de fallos"
-            dialogue="¡Escúchame bien, equipo...! No me queda mucho tiempo... 🥺 Durante toda esta aventura, mientras vosotros resolvíais los enigmas, el cortafuegos principal se estaba desintegrando. Para proteger vuestros avances, he tenido que absorber los errores dentro de mi propia memoria... Mis núcleos se están apagando... 💔 Esta es la Gran Consola de las Constantes Perdidas. Tenéis que averiguar los valores de x y resolver los exponentes negativos. Si fallamos aquí, yo desapareceré del todo para siempre. ¡Confío en vosotros!"
-            buttonLabel="¡RESTAURAR CONSTANTES Y SALVAR A ALEX-A!"
-            isGlitching={true}
-            onProceed={() => setPhase('MISSION_5')}
-          />
-        )}
+        {phase === 'BRIEFING_M5' && progress && (() => {
+          const { chamber, copy } = getRoleChamberCopy('M5');
+          return (
+            <CinematicBriefing
+              emotion="critical"
+              tag={copy.contextTag}
+              title={`Alerta Crítica: ${chamber.chamberTitle}`}
+              subtitle="Desintegración del cortafuegos: incógnitas y exponentes negativos"
+              dialogue={copy.dialogue}
+              roleId={progress.roleId}
+              whyYou={copy.whyYou}
+              buttonLabel="Restaurar constantes y salvar a ALEX-A"
+              isGlitching={true}
+              onProceed={() => setPhase('MISSION_5')}
+            />
+          );
+        })()}
 
         {/* Phase: Misión 5 */}
         {phase === 'MISSION_5' && (

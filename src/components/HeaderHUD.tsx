@@ -12,7 +12,8 @@ import {
   VolumeX, 
   Music, 
   Sparkles,
-  Zap
+  Zap,
+  RotateCcw
 } from 'lucide-react';
 
 interface HeaderHUDProps {
@@ -28,9 +29,11 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   currentPhase,
   alexaEmotion,
   onOpenTeacherPanel,
+  onRestartStudent,
 }) => {
   const [soundOn, setSoundOn] = useState(true);
   const [musicOn, setMusicOn] = useState(egyptianMusic.getIsPlaying());
+  const [confirmRestart, setConfirmRestart] = useState(false);
 
   React.useEffect(() => {
     const unsub = egyptianMusic.subscribe((playing) => {
@@ -74,7 +77,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
 
   return (
     <header className="sticky top-0 z-50 bg-[#16100B]/95 backdrop-blur-md border-b border-[#D4AF37]/35 px-4 py-2.5 shadow-lg">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         
         {/* Zone 1: Brand Wordmark & Alexandria Seal */}
         <div className="flex items-center gap-3 shrink-0">
@@ -97,8 +100,8 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
         </div>
 
         {/* Zone 2: Status Indicators & Server Integrity */}
-        {progress && currentPhase !== 'AUTH' && (
-          <div className="hidden lg:flex items-center gap-6 text-xs">
+        {progress && currentPhase !== 'AUTH' && currentPhase !== 'TEACHER_PANEL' && (
+          <div className="hidden lg:flex items-center gap-5 text-xs">
             {/* XP Counter */}
             <div className="flex items-center gap-2 bg-[#120E0A] px-3 py-1.5 rounded-lg border border-[#D4AF37]/30">
               <Zap className="w-4 h-4 text-[#D4AF37]" />
@@ -109,7 +112,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             </div>
 
             {/* Server Integrity Meter */}
-            <div className="flex items-center gap-2 bg-[#120E0A] px-3 py-1.5 rounded-lg border border-[#D4AF37]/30 w-48">
+            <div className="flex items-center gap-2 bg-[#120E0A] px-3 py-1.5 rounded-lg border border-[#D4AF37]/30 w-44">
               <Shield className={`w-4 h-4 shrink-0 ${progress.serverIntegrity < 40 ? 'text-[#EF4444]' : 'text-[#00E5FF]'}`} />
               <div className="flex-1">
                 <div className="flex justify-between text-[11px] mb-1">
@@ -136,17 +139,17 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             {/* ALEX-A State Tag */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#120E0A] text-slate-300 border border-[#D4AF37]/30">
               <span className={`w-2 h-2 rounded-full ${
-                alexaEmotion === 'critical' ? 'bg-[#EF4444] animate-ping' : alexaEmotion === 'enthusiastic' ? 'bg-[#00FF88]' : 'bg-[#00E5FF]'
+                alexaEmotion === 'critical' ? 'bg-[#EF4444]' : alexaEmotion === 'enthusiastic' ? 'bg-[#00FF88]' : 'bg-[#00E5FF]'
               }`} />
               <span className="text-[11px]">ALEX-A:</span>
-              <span className="text-[11px] font-medium text-white capitalize">
-                {alexaEmotion === 'cold' ? 'Prudente' : alexaEmotion === 'enthusiastic' ? 'Entusiasta' : 'Crítica'}
+              <span className="text-[11px] font-medium text-white">
+                {alexaEmotion === 'cold' ? 'Prudente' : alexaEmotion === 'enthusiastic' ? 'Aliada' : 'En riesgo'}
               </span>
             </div>
           </div>
         )}
 
-        {/* Zone 3: Actions (Music, SFX, Diploma PDF, Teacher Panel) */}
+        {/* Zone 3: Actions (Music, SFX, Restart, Diploma PDF, Teacher Panel) */}
         <div className="flex items-center gap-2 shrink-0">
           {/* Egyptian Ambient Music Toggle */}
           <button
@@ -155,7 +158,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
             aria-label="Toggle Egyptian Ambient Music"
             className={`p-2 rounded-lg transition-all border ${
               musicOn 
-                ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.3)] animate-pulse' 
+                ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.25)]' 
                 : 'bg-[#120E0A] hover:bg-[#251C14] text-slate-400 hover:text-white border-[#D4AF37]/30'
             }`}
           >
@@ -171,6 +174,46 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
           >
             {soundOn ? <Volume2 className="w-4 h-4 text-[#00E5FF]" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
           </button>
+
+          {/* Inline-confirmed Student Expedition Restart */}
+          {progress && onRestartStudent && currentPhase !== 'AUTH' && currentPhase !== 'TEACHER_PANEL' && (
+            !confirmRestart ? (
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setConfirmRestart(true);
+                }}
+                title="Reiniciar toda la expedición desde el principio"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#120E0A] hover:bg-[#251C14] text-slate-300 hover:text-[#EF4444] text-xs transition-colors border border-[#D4AF37]/30"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Reiniciar</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 bg-[#120E0A] border border-[#EF4444]/60 rounded-lg px-2 py-1 text-[11px]">
+                <span className="text-[#FCA5A5] hidden sm:inline">¿Reiniciar todo?</span>
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setConfirmRestart(false);
+                    onRestartStudent();
+                  }}
+                  className="px-2 py-0.5 rounded bg-[#EF4444] hover:bg-[#DC2626] text-white font-bold"
+                >
+                  Sí
+                </button>
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setConfirmRestart(false);
+                  }}
+                  className="px-2 py-0.5 rounded bg-[#1C150F] hover:bg-[#251C14] text-slate-300"
+                >
+                  No
+                </button>
+              </div>
+            )
+          )}
 
           {/* Permanent Global HUD Button: Descargar Certificado / Diploma PDF */}
           <button

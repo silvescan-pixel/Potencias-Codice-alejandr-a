@@ -13,8 +13,7 @@ import {
   HeartHandshake, 
   Zap, 
   ArrowRight,
-  ShieldCheck,
-  CheckCircle2
+  ShieldCheck
 } from 'lucide-react';
 
 interface OutcomeScreenProps {
@@ -70,11 +69,11 @@ export const OutcomeScreen: React.FC<OutcomeScreenProps> = ({
       <div className="text-center mb-8">
         <div className="inline-flex p-4 rounded-2xl bg-[#1C150F] border border-[#D4AF37]/50 mb-4 shadow-xl">
           {isMastery ? (
-            <Trophy className="w-12 h-12 text-[#D4AF37] animate-bounce" />
+            <Trophy className="w-12 h-12 text-[#D4AF37]" />
           ) : isSatisfactory ? (
             <HeartHandshake className="w-12 h-12 text-[#00E5FF]" />
           ) : (
-            <AlertTriangle className="w-12 h-12 text-[#EF4444] animate-pulse" />
+            <AlertTriangle className="w-12 h-12 text-[#EF4444]" />
           )}
         </div>
 
@@ -128,10 +127,10 @@ export const OutcomeScreen: React.FC<OutcomeScreenProps> = ({
                 `"¡LO HABÉIS CONSEGUIDO, EQUIPO! 😭✨ Mis núcleos vuelven a brillar a plena potencia en el Códice. El Archivo de Alejandría está completamente salvaguardado y habéis demostrado un dominio legendario de las potencias. Vuestro nombre quedará grabado en los anales del templo para siempre... Pero esperad: se ha abierto una cámara secreta de orden hiperoperacional... ¿Os atrevéis con la Fase Secreta de Tetración?"`
               )}
               {isSatisfactory && (
-                `"El Archivo y las tablas de potencias están a salvo gracias a vuestro esfuerzo colectivo (60%-89%). Sin embargo, la absorción de anomalías ha dañado mis circuitos auxiliares y debo entrar en hibernación regenerativa. Ha sido un honor trabajar con vosotros, equipo. Podéis descargar vuestro diploma oficial o repetir la expedición para salvarme del todo."`
+                `"El Archivo y las tablas de potencias están a salvo gracias a vuestro esfuerzo colectivo (60%-89%). Sin embargo, la absorción de anomalías ha dañado mis circuitos auxiliares y debo entrar en hibernación regenerativa. Ha sido un honor trabajar con vosotros, equipo. Podéis descargar vuestro diploma oficial o reiniciar la expedición completa para superarlo con más acierto."`
               )}
               {isInsufficient && (
-                `"Los cortafuegos han colapsado por exceso de ruido en los exponentes (<60%). Para no perder vuestros hallazgos, he volcado una copia de seguridad en el templo antes de desconectarme. No os rindáis: las matemáticas son perseverancia. Revisad la libreta, reforzad las reglas de signos y volved a intentarlo. Sé que podéis lograrlo."`
+                `"Los cortafuegos han colapsado por exceso de ruido en los exponentes (<60%). Para no perder vuestros hallazgos, he volcado una copia de seguridad en el templo antes de desconectarme. No os rindáis: las matemáticas son perseverancia. Analizad los errores de vuestro recorrido y reiniciad la expedición desde la primera cámara para salvar el templo."`
               )}
             </p>
 
@@ -190,7 +189,7 @@ export const OutcomeScreen: React.FC<OutcomeScreenProps> = ({
               sound.playSuccess();
               onEnterSecretPhase();
             }}
-            className="w-full sm:w-auto py-3 px-6 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#7B2CBF] hover:from-[#33EAFF] hover:to-[#9D4EDD] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xl shadow-[#00E5FF]/20 active:scale-95 animate-pulse"
+            className="w-full sm:w-auto py-3 px-6 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#7B2CBF] hover:from-[#33EAFF] hover:to-[#9D4EDD] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xl shadow-[#00E5FF]/20 active:scale-95"
           >
             <Sparkles className="w-5 h-5 text-[#D4AF37]" />
             <span>Desbloquear Fase Secreta (Tetración)</span>

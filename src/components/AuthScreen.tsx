@@ -194,7 +194,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
         <div className="mt-6 pt-5 border-t border-[#D4AF37]/25 flex items-center justify-center text-xs text-slate-400">
           <div className="flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span>Ficha de Ejercicios Oficial Integrada · Educación Secundaria</span>
+            <span>Códice Digital de Potencias · Educación Secundaria</span>
           </div>
         </div>
       </div>
